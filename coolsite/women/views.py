@@ -1,9 +1,11 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect
 
-
 def index(request):
-    return HttpResponse("Страница приложения women.")
+    return render(request, 'women/index.html')
+
+def about(request):
+    return render(request, 'women/about.html')
 
 def categories(request, catid):
     if request.GET:
