@@ -30,6 +30,10 @@ def contact(request):
 def login(request):
     return HttpResponse("Войти")
 
+def show_post(request, post_id):
+    return HttpResponse(f"Отображение статьи с id = {post_id}")
+
+
 def categories(request, catid):
     if request.GET:
         print(request.GET)
