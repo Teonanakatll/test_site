@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect
 
-from .models import Women
+from .models import Women, Category
 
 menu = [{'title': 'О сайте', 'url_name': 'about'},
         {'title': 'Добавить статью', 'url_name': 'add_page'},
@@ -11,9 +11,12 @@ menu = [{'title': 'О сайте', 'url_name': 'about'},
 
 def index(request):
     posts = Women.objects.all()
+    cats = Category.objects.all()
     data = {
         'posts': posts,
+        'cats': cats,
         'menu': menu,
+        'cat_selected': 0,
         'title': 'Главная страница'
     }
     return render(request, 'women/index.html', context=data)
@@ -32,6 +35,9 @@ def login(request):
 
 def show_post(request, post_id):
     return HttpResponse(f"Отображение статьи с id = {post_id}")
+
+def show_category(request, cat_id):
+    return HttpResponse(f"Отображение категории с if = {cat_id}")
 
 
 def categories(request, catid):
