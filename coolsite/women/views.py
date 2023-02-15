@@ -3,14 +3,32 @@ from django.shortcuts import render, redirect
 
 from .models import Women
 
-menu = ["О сайте", "Добавить статью", "Обратная связь", "Войти"]
+menu = [{'title': 'О сайте', 'url_name': 'about'},
+        {'title': 'Добавить статью', 'url_name': 'add_page'},
+        {'title': 'Обратная связь', 'url_name': 'contact'},
+        {'title': 'Войти', 'url_name': 'login'}
+        ]
 
 def index(request):
     posts = Women.objects.all()
-    return render(request, 'women/index.html', {'posts': posts, 'menu': menu, 'title': 'Главная страница'})
+    data = {
+        'posts': posts,
+        'menu': menu,
+        'title': 'Главная страница'
+    }
+    return render(request, 'women/index.html', context=data)
 
 def about(request):
     return render(request, 'women/about.html', {'menu': menu, 'title': 'О сайте'})
+
+def addpage(request):
+    return HttpResponse("Добавление статьи")
+
+def contact(request):
+    return HttpResponse("Обратная связь")
+
+def login(request):
+    return HttpResponse("Войти")
 
 def categories(request, catid):
     if request.GET:
