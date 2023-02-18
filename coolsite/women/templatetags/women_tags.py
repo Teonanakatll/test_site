@@ -3,6 +3,12 @@ from women.models import *
 
 register = template.Library()
 
+menu = [{'title': 'О сайте', 'url_name': 'about'},
+        {'title': 'Добавить статью', 'url_name': 'add_page'},
+        {'title': 'Обратная связь', 'url_name': 'contact'},
+        {'title': 'Войти', 'url_name': 'login'}
+        ]
+
 @register.simple_tag(name='get_cats')
 def get_categories(filter=None):
     if not filter:
@@ -21,3 +27,11 @@ def show_categories(sort=None, cat_selected=0):
 
     # cats = Category.objects.all()
     # return {"cats": cats}
+
+@register.simple_tag(name='get_M')
+def get_menu():
+    return menu
+
+@register.inclusion_tag('women/list_menu.html')
+def show_menu():
+    return {'menu': menu}
