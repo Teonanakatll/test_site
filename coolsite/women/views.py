@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Women, Category
 
@@ -25,7 +25,16 @@ def login(request):
     return HttpResponse("Войти")
 
 def show_post(request, post_id):
-    return HttpResponse(f"Отображение статьи с id = {post_id}")
+    post = get_object_or_404(Women, pk=post_id)
+
+    slovar = {
+        'post': post,
+        'title': post.title,
+        'cat_selected': post.cat_id,
+    }
+
+    # Передаём эти параметры шаблону women/post.html
+    return render(request, 'women/post.html', context=slovar)
 
 def show_category(request, cat_id):
     posts = Women.objects.filter(cat_id=cat_id)
