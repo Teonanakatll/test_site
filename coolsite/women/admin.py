@@ -18,10 +18,14 @@ class WomenAdmin(admin.ModelAdmin):
     # Поля по которым можно фильтровать список статей (сайт-бар)
     list_filter = ('is_published', 'time_create')
 
+    # Автоматически заполняет поле slug при добавлении экземпляра класса
+    prepopulated_fields = {'slug': ('title',)}
+
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_display_links = ('id', 'name')
     search_fields = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
 
 admin.site.register(Women, WomenAdmin)
 admin.site.register(Category, CategoryAdmin)

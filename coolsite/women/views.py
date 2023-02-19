@@ -13,7 +13,7 @@ def index(request):
     return render(request, 'women/index.html', context=data)
 
 def about(request):
-    return render(request, 'women/about.html', {'menu': menu, 'title': 'О сайте'})
+    return render(request, 'women/about.html', {'title': 'О сайте'})
 
 def addpage(request):
     return HttpResponse("Добавление статьи")
@@ -24,8 +24,8 @@ def contact(request):
 def login(request):
     return HttpResponse("Войти")
 
-def show_post(request, post_id):
-    post = get_object_or_404(Women, pk=post_id)
+def show_post(request, post_slug):
+    post = get_object_or_404(Women, slug=post_slug)
 
     slovar = {
         'post': post,
@@ -36,8 +36,16 @@ def show_post(request, post_id):
     # Передаём эти параметры шаблону women/post.html
     return render(request, 'women/post.html', context=slovar)
 
-def show_category(request, cat_id):
-    posts = Women.objects.filter(cat_id=cat_id)
+def show_category(request, cat_slug):
+    c = Category.objects.get(slug=cat_slug)
+    posts = Women.objects.filter(cat=c.id)
+
+    # Выбор постов через свойства первичной модели
+    # posts = c.women_set.all()
+
+    # Или в одну строчку
+    # posts = Category.objects.get(slug=cat_slug).women_set.all()
+
 
     if len(posts) == 0:
         raise Http404()
@@ -45,7 +53,7 @@ def show_category(request, cat_id):
     data = {
         'posts': posts,
         'title': 'Отображение по рубрикам',
-        'cat_selected': cat_id,
+        'cat_selected': posts[0].cat_id,
     }
 
     return render(request, 'women/index.html', context=data)
