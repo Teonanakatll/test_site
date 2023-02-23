@@ -20,16 +20,19 @@ def addpage(request):
     # Если форма с заполненными данными
     if request.method == 'POST':
         # При создании формы обр. к обь. request и берем колекции POST и FILES
-        form = AddPostForm(request.POST)
+        form = AddPostForm(request.POST, request.FILES)
         # Проверка коректности данных переданных на сервер
         if form.is_valid():
-            print(form.cleaned.data)   # Принт очищенных данных
-            try:    # (если форма не связанна с моделью)
-                # Добавление записи в модель Women
-                Women.objects.create(**form.cleaned_data)
-                return redirect('home')
-            except:
-                form.add_error(None, 'Ошибка добавления поста')
+            form.save()  # Cохранение данных формы связанной с моделью
+            return redirect('home')
+
+            # print(form.cleaned.data)   # Принт очищенных данных
+            # try:    # (если форма не связанна с моделью)
+            #     # Добавление записи в модель Women
+            #     Women.objects.create(**form.cleaned_data)
+            #     return redirect('home')
+            # except:
+            #     form.add_error(None, 'Ошибка добавления поста')
     else:
         # Пустая форма
         form = AddPostForm()
