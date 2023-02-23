@@ -1,4 +1,6 @@
 from django import forms
+from django.core.exceptions import ValidationError
+
 from .models import *
 
 class AddPostForm(forms.ModelForm):
@@ -13,6 +15,15 @@ class AddPostForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-input'}),
             'content': forms.Textarea(attrs={'cols': 60, 'rows': 10}),
         }
+
+    # Метод валидации должен называться clean_'поле'(self):
+    # и должен генерировать исключение ValidationError
+    def clean_title(self):
+        # Обращаемся к колекции cleaned_data и берем данные по заголовку 'title'
+        title = self.cleaned_data['title']
+        if len(title) > 200:
+            raise ValidationError('Длинна превышает 200 символов')
+        return title
 
 # class AddPostForm(forms.Form):
 #     # wiget=forms.TextInput(attrs={'class': 'form-input'} - добавление сss класса к полю формы
