@@ -89,24 +89,42 @@ def show_post(request, post_slug):
     # Передаём эти параметры шаблону women/post.html
     return render(request, 'women/post.html', context=slovar)
 
-def show_category(request, cat_slug):
-    c = Category.objects.get(slug=cat_slug)
-    posts = Women.objects.filter(cat=c.id)
-    # Выбор постов через свойства первичной модели
-    # posts = c.women_set.all()
-    # Или в одну строчку
-    # posts = Category.objects.get(slug=cat_slug).women_set.all()
+# def show_category(request, cat_slug):
+#     c = Category.objects.get(slug=cat_slug)
+#     posts = Women.objects.filter(cat=c.id)
+#     # Выбор постов через свойства первичной модели
+#     # posts = c.women_set.all()
+#     # Или в одну строчку
+#     # posts = Category.objects.get(slug=cat_slug).women_set.all()
+#
+#     if len(posts) == 0:
+#         raise Http404()
+#     data = {
+#         'posts': posts,
+#         'title': 'Отображение по рубрикам',
+#         'cat_selected': posts[0].cat_id,
+#     }
+#     return render(request, 'women/index.html', context=data)
 
-    if len(posts) == 0:
-        raise Http404()
-    data = {
-        'posts': posts,
-        'title': 'Отображение по рубрикам',
-        'cat_selected': posts[0].cat_id,
-    }
-    return render(request, 'women/index.html', context=data)
+class WomenCategory(ListView):
+    model = Women
+    template_name = 'women/index.html'
+    context_object_name = 'posts'
+    # Если категория не содержит записей генерируем ошибку 404
+    allow_empty = False
 
+    def get_queryset(self):
+        # Когда будет формироваться экз. кл. WomenCategory для конкретного запроса
+        # Через cсылку self обращаемся к словарю kwargs и берем параметр cat_slug
+        # 'cat__slug' обращение к полю slug связанного первичного класса
+        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Категория - ' + str(context['posts'][0].cat)
+        context['menu'] = menu
+        context['cat_selected'] = context['posts'][0].cat_id
+        return context
 
 def categories(request, catid):
     if request.GET:
