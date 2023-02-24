@@ -1,9 +1,9 @@
 from django.urls import path, re_path
 
-from .views import index, categories, archive, about, addpage, contact, login, show_post, show_category
+from .views import archive, about, addpage, contact, login, show_post, show_category, WomenHome
 
 urlpatterns = [
-    path('', index, name='home'),
+    path('', WomenHome.as_view(), name='home'),
     path('about/', about, name='about'),
     path('addpage/', addpage, name='add_page'),
     path('contact/', contact, name='contact'),
