@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 from .forms import AddPostForm
 from .models import Women, Category
@@ -77,17 +77,30 @@ def contact(request):
 def login(request):
     return HttpResponse("Войти")
 
-def show_post(request, post_slug):
-    post = get_object_or_404(Women, slug=post_slug)
+# def show_post(request, post_slug):
+#     post = get_object_or_404(Women, slug=post_slug)
+#
+#     context = {
+#         'post': post,
+#         'title': post.title,
+#         'cat_selected': post.cat_id,
+#     }
+#     return render(request, 'women/post.html', context=context)
 
-    slovar = {
-        'post': post,
-        'title': post.title,
-        'cat_selected': post.cat_id,
-    }
+class ShowPost(DetailView):
+    model = Women
+    template_name = 'women/post.html'
+    # По умолчанию DetailView использует для слага имя переменной 'slug', чтобы использовать
+    # 'post_slug' нужно её переименовать
+    slug_url_kwarg = 'post_slug'
+    #pk_url_kwarg = 'post_pk'   по умолчанию = pk
+    context_object_name = 'post'
 
-    # Передаём эти параметры шаблону women/post.html
-    return render(request, 'women/post.html', context=slovar)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = context['post']
+        context['menu'] = menu
+        return context
 
 # def show_category(request, cat_slug):
 #     c = Category.objects.get(slug=cat_slug)
