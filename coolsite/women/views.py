@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView, DetailView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView
 
 from .forms import AddPostForm
 from .models import Women, Category
@@ -49,27 +50,41 @@ class WomenHome(ListView):
 def about(request):
     return render(request, 'women/about.html', {'title': 'О сайте'})
 
-def addpage(request):
-    # Если форма с заполненными данными
-    if request.method == 'POST':
-        # При создании формы обр. к обь. request и берем колекции POST и FILES
-        form = AddPostForm(request.POST, request.FILES)
-        # Проверка коректности данных переданных на сервер
-        if form.is_valid():
-            form.save()  # Cохранение данных формы связанной с моделью
-            return redirect('home')
+# def addpage(request):
+#     # Если форма с заполненными данными
+#     if request.method == 'POST':
+#         # При создании формы обр. к обь. request и берем колекции POST и FILES
+#         form = AddPostForm(request.POST, request.FILES)
+#         # Проверка коректности данных переданных на сервер
+#         if form.is_valid():
+#             form.save()  # Cохранение данных формы связанной с моделью
+#             return redirect('home')
+#
+#             # print(form.cleaned.data)   # Принт очищенных данных
+#             # try:    # (если форма не связанна с моделью)
+#             #     # Добавление записи в модель Women
+#             #     Women.objects.create(**form.cleaned_data)
+#             #     return redirect('home')
+#             # except:
+#             #     form.add_error(None, 'Ошибка добавления поста')
+#     else:
+#         # Пустая форма
+#         form = AddPostForm()
+#     return render(request, 'women/addpage.html', {'form': form, 'title': 'Добавление статьи'})
 
-            # print(form.cleaned.data)   # Принт очищенных данных
-            # try:    # (если форма не связанна с моделью)
-            #     # Добавление записи в модель Women
-            #     Women.objects.create(**form.cleaned_data)
-            #     return redirect('home')
-            # except:
-            #     form.add_error(None, 'Ошибка добавления поста')
-    else:
-        # Пустая форма
-        form = AddPostForm()
-    return render(request, 'women/addpage.html', {'form': form, 'title': 'Добавление статьи'})
+class AddPage(CreateView):
+    # Указывает с какой формой связан этот класс представления
+    form_class = AddPostForm
+    template_name = 'women/addpage.html'
+    # Адрес переадресации после добавления статьи
+    # Ленивая ссылка формируется только когда понадобится
+    success_url = reverse_lazy('home')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Добавление статьи'
+        context['menu'] = menu
+        return context
 
 def contact(request):
     return HttpResponse("Обратная связь")
