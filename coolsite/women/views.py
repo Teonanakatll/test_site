@@ -5,12 +5,7 @@ from django.views.generic import ListView, DetailView, CreateView
 
 from .forms import AddPostForm
 from .models import Women, Category
-
-menu = [{'title': 'О сайте', 'url_name': 'about'},
-        {'title': 'Добавить статью', 'url_name': 'add_page'},
-        {'title': 'Обратная связь', 'url_name': 'contact'},
-        {'title': 'Войти', 'url_name': 'login'}
-        ]
+from .utils import *
 
 # def index(request):
 #     posts = Women.objects.all()
@@ -21,12 +16,12 @@ menu = [{'title': 'О сайте', 'url_name': 'about'},
 #     }
 #     return render(request, 'women/index.html', context=data)
 
-class WomenHome(ListView):
+class WomenHome(DataMixin, ListView):
     # Создаёт по умолчанию коллекцию object_list
     model = Women
     # По умолчанию ищет шаблон 'имя приложения'/'имя модели'_list.html
     template_name = 'women/index.html'
-    # Переименовываем колекцию object_list
+    # Переименовываем коллекцию object_list
     context_object_name = 'posts'
     # extra_context = {'title': 'Главная страница'}
 
@@ -34,12 +29,10 @@ class WomenHome(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         # Обращаемся к классу WomenHome и берем существующий контекст, **kwargs - все именованные парам.
         context = super().get_context_data(**kwargs)
-        # Новому сформированному ключу 'menu' - присваиваем список menu
-        context['menu'] = menu
-        context['title'] = 'Главная страница'
-        context['cat_selected'] = 0
-        # Возвращаем context в шаблон
-        return context
+        # Обращаемся к методу родительского класса DataMixin
+        c_def = self.get_user_context(title='Главная страница')
+        # Возвращаем dict в шаблон
+        return dict(list(context.items()) + list(c_def.items()))
 
     # Метод возвращает список записей отфильтрованный по условию
     def get_queryset(self):
@@ -72,7 +65,7 @@ def about(request):
 #         form = AddPostForm()
 #     return render(request, 'women/addpage.html', {'form': form, 'title': 'Добавление статьи'})
 
-class AddPage(CreateView):
+class AddPage(DataMixin, CreateView):
     # Указывает с какой формой связан этот класс представления
     form_class = AddPostForm
     template_name = 'women/addpage.html'
@@ -82,9 +75,8 @@ class AddPage(CreateView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Добавление статьи'
-        context['menu'] = menu
-        return context
+        c_def = self.get_user_context(title='Добавление статьи')
+        return dict(list(context.items()) + list(c_def.items()))
 
 def contact(request):
     return HttpResponse("Обратная связь")
@@ -102,7 +94,7 @@ def login(request):
 #     }
 #     return render(request, 'women/post.html', context=context)
 
-class ShowPost(DetailView):
+class ShowPost(DataMixin, DetailView):
     model = Women
     template_name = 'women/post.html'
     # По умолчанию DetailView использует для слага имя переменной 'slug', чтобы использовать
@@ -113,9 +105,8 @@ class ShowPost(DetailView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = context['post']
-        context['menu'] = menu
-        return context
+        c_def = self.get_user_context(title=context['post'])
+        return dict(list(context.items()) + list(c_def.items()))
 
 # def show_category(request, cat_slug):
 #     c = Category.objects.get(slug=cat_slug)
@@ -134,7 +125,7 @@ class ShowPost(DetailView):
 #     }
 #     return render(request, 'women/index.html', context=data)
 
-class WomenCategory(ListView):
+class WomenCategory(DataMixin, ListView):
     model = Women
     template_name = 'women/index.html'
     context_object_name = 'posts'
@@ -149,10 +140,12 @@ class WomenCategory(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Категория - ' + str(context['posts'][0].cat)
-        context['menu'] = menu
-        context['cat_selected'] = context['posts'][0].cat_id
-        return context
+        # context['title'] = 'Категория - ' + str(context['posts'][0].cat)
+        # context['menu'] = menu
+        # context['cat_selected'] = context['posts'][0].cat_id
+        c_def = self.get_user_context(title='Категория - ' + str(context['posts'][0].cat),
+                                      cat_selected=context['posts'][0].cat_id)
+        return dict(list(context.items()) + list(c_def.items()))
 
 def categories(request, catid):
     if request.GET:
