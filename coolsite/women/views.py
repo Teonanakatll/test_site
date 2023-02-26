@@ -1,7 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import AddPostForm
 from .models import Women, Category
@@ -39,7 +41,8 @@ class WomenHome(DataMixin, ListView):
         return Women.objects.filter(is_published=True)
 
 
-
+# В функциях для ограничения доступа используют декоратор
+@login_required
 def about(request):
     return render(request, 'women/about.html', {'title': 'О сайте'})
 
@@ -65,13 +68,15 @@ def about(request):
 #         form = AddPostForm()
 #     return render(request, 'women/addpage.html', {'form': form, 'title': 'Добавление статьи'})
 
-class AddPage(DataMixin, CreateView):
+class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     # Указывает с какой формой связан этот класс представления
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     # Адрес переадресации после добавления статьи
     # Ленивая ссылка формируется только когда понадобится
     success_url = reverse_lazy('home')
+    # Адрес перенаправления для незарегистрированного пользователя
+    login_url = 'home'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
