@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -18,7 +19,8 @@ from .utils import *
 #     }
 #     return render(request, 'women/index.html', context=data)
 
-class WomenHome(DataMixin, ListView):
+class WomenHome(DataMixin, ListView):  #  В ListView уже встроен Paginator
+    paginate_by = 3
     # Создаёт по умолчанию коллекцию object_list
     model = Women
     # По умолчанию ищет шаблон 'имя приложения'/'имя модели'_list.html
@@ -43,8 +45,15 @@ class WomenHome(DataMixin, ListView):
 
 # В функциях для ограничения доступа используют декоратор
 # @login_required
-def about(request):
-    return render(request, 'women/about.html', {'title': 'О сайте'})
+def about(request):  # Пагинация в функциях представлений
+    contact_list = Women.objects.all()
+    paginator = Paginator(contact_list, 3)
+
+    # Берем номер текущей страницы: обращаясь к колекции GET берем атрибут 'page'
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    # Передаём page_obj в шаблон
+    return render(request, 'women/about.html', {'page_obj': page_obj, 'title': 'О сайте'})
 
 # def addpage(request):
 #     # Если форма с заполненными данными
