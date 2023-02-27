@@ -42,7 +42,7 @@ class WomenHome(DataMixin, ListView):
 
 
 # В функциях для ограничения доступа используют декоратор
-@login_required
+# @login_required
 def about(request):
     return render(request, 'women/about.html', {'title': 'О сайте'})
 
