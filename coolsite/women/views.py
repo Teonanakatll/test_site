@@ -19,8 +19,10 @@ from .utils import *
 #     }
 #     return render(request, 'women/index.html', context=data)
 
-class WomenHome(DataMixin, ListView):  #  В ListView уже встроен Paginator
-    paginate_by = 3
+class WomenHome(DataMixin, ListView):  #  В ListView уже встроен Paginator и автоматически передаёт в
+                # шаблон ссылку на класс Paginator и page_obj который содержит список обьектов для
+                # текущей страницы
+    # paginate_by = 3
     # Создаёт по умолчанию коллекцию object_list
     model = Women
     # По умолчанию ищет шаблон 'имя приложения'/'имя модели'_list.html

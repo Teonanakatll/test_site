@@ -72,6 +72,23 @@
 	<div class="content-text">
 {% block content %}
 {% endblock %}
+
+		<nav class="liat-pages">
+			<ul>
+				{% for p in paginator.page_range %}
+<!--	Если номер текущей страницы совпадает с номером 'p' -->
+				{% if page_obj.number == p %}
+				<li class="page-num page-num-selected">{{ p }}</li>
+				{% else %}
+
+				<li class="page-num">
+					<a href="?page={{ p }}">{{ p }}</a>
+				</li>
+				{% endif %}
+				{% endfor %}
+			</ul>
+		</nav>
+
 	</div>
 <!-- Конец блока контента -->
 
