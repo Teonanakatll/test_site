@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import AddPostForm, RegisterUserForm
+from .forms import AddPostForm, RegisterUserForm, LoginUserForm
 from .models import Women, Category
 from .utils import *
 
@@ -103,7 +103,7 @@ def contact(request):
 # Наследуем класс от стандартного класса LoginView в котором реализованна вся
 # необходимая логика для авторизации пользователя
 class LoginUser(DataMixin, LoginView):
-    form_class = AuthenticationForm  # Стандартная форма авторизации Django
+    form_class = LoginUserForm  #AuthenticationForm  # Стандартная форма авторизации Django
     template_name = 'women/login.html'
 
     def get_context_data(self, *, object_list=None, **kwargs):
