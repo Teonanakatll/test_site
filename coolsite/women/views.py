@@ -1,4 +1,4 @@
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
@@ -188,6 +188,7 @@ class WomenCategory(DataMixin, ListView):
                                       cat_selected=context['posts'][0].cat_id)
         return dict(list(context.items()) + list(c_def.items()))
 
+
 # Так как он работает с формой (заносит данные в бд), наследуем его от класса CreateView
 class RegisterUser(DataMixin, CreateView):
     # Ссылка на стандартную форму джанго для регистрации пользовотелей
@@ -200,6 +201,12 @@ class RegisterUser(DataMixin, CreateView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Регистрация')
         return dict(list(context.items()) + list(c_def.items()))
+
+    # При успешной регистрации авторизуем пользователя (вызывается этот метод)
+    def form_valid(self, form):
+        user = form.save()  # Самостоятельно сохраняем форму (добавляем польз. в бд)
+        login(self.request, user)  # Вызываем функцию login которая авторизовывает польз.
+        return redirect('home')
 
 def categories(request, catid):
     if request.GET:
