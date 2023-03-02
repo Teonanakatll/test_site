@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -89,6 +90,7 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     # Адрес перенаправления для незарегистрированного пользователя
     login_url = 'home'
 
+    # Формируем контекст для шаблона
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Добавление статьи')
@@ -119,6 +121,7 @@ class ShowPost(DataMixin, DetailView):
     #pk_url_kwarg = 'post_pk'   по умолчанию = pk
     context_object_name = 'post'
 
+    # Формируем котекст для шаблона
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title=context['post'])
@@ -154,6 +157,7 @@ class WomenCategory(DataMixin, ListView):
         # 'cat__slug' обращение к полю slug связанного первичного класса
         return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
 
+    # Формируем контекст для щаблона
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         # context['title'] = 'Категория - ' + str(context['posts'][0].cat)
@@ -161,6 +165,19 @@ class WomenCategory(DataMixin, ListView):
         # context['cat_selected'] = context['posts'][0].cat_id
         c_def = self.get_user_context(title='Категория - ' + str(context['posts'][0].cat),
                                       cat_selected=context['posts'][0].cat_id)
+        return dict(list(context.items()) + list(c_def.items()))
+
+# Так как он работает с формой (заносит данные в бд), наследуем его от класса CreateView
+class RegisterUser(DataMixin, CreateView):
+    # Ссылка на стандартную форму джанго для регистрации пользовотелей
+    form_class = UserCreationForm
+    template_name = 'women/register.html'
+    success_url = reverse_lazy('login')
+
+    # Формируем контекст для шаблона
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Регистрация')
         return dict(list(context.items()) + list(c_def.items()))
 
 def categories(request, catid):
