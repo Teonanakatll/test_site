@@ -1,3 +1,4 @@
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
@@ -117,6 +118,10 @@ class LoginUser(DataMixin, LoginView):
         return reverse_lazy('home')
     # Переадресацию можно прописать и в settings.py
 
+def logout_user(request):
+    # Стандартная функция Django для выхода из авторизации
+    logout(request)
+    return redirect('login')
 
 # def show_post(request, post_slug):
 #     post = get_object_or_404(Women, slug=post_slug)
