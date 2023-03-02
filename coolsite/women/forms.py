@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 from .models import *
@@ -24,6 +26,19 @@ class AddPostForm(forms.ModelForm):
         if len(title) > 200:
             raise ValidationError('Длинна превышает 200 символов')
         return title
+
+# UserCreationForm - стандартный класс на базе которого мы будем создавать свой (расширяя)
+class RegisterUserForm(UserCreationForm):
+    # Переопределяем атрибуты и назначаем им стили оформления
+    username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'form-input'}))
+    password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
+    password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
+    class Meta:
+        model = User  # Стандартный класс работоет с таблицей auth_user
+        # Поля которые будут отображаться в форме, посмотреть их можно через браузер
+        fields = ('username','email', 'password1', 'password2')
+
 
 # class AddPostForm(forms.Form):
 #     # wiget=forms.TextInput(attrs={'class': 'form-input'} - добавление сss класса к полю формы

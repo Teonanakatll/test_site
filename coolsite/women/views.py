@@ -1,5 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -7,7 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import AddPostForm
+from .forms import AddPostForm, RegisterUserForm
 from .models import Women, Category
 from .utils import *
 
@@ -170,7 +169,7 @@ class WomenCategory(DataMixin, ListView):
 # Так как он работает с формой (заносит данные в бд), наследуем его от класса CreateView
 class RegisterUser(DataMixin, CreateView):
     # Ссылка на стандартную форму джанго для регистрации пользовотелей
-    form_class = UserCreationForm
+    form_class = RegisterUserForm  #UserCreationForm
     template_name = 'women/register.html'
     success_url = reverse_lazy('login')
 
