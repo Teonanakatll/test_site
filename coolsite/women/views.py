@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
+from django.views.decorators.cache import cache_page
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -51,6 +52,7 @@ class WomenHome(DataMixin, ListView):  #  В ListView уже встроен Pagi
 
 # В функциях для ограничения доступа используют декоратор
 # @login_required
+@cache_page(60 * 15)   # Декоратор для кеширования ф. пред.
 def about(request):  # Пагинация в функциях представлений
     contact_list = Women.objects.all()
     paginator = Paginator(contact_list, 3)

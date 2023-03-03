@@ -132,6 +132,16 @@ MEDIA_URL = '/media/'
 
 # Константа для перенаправления при авторизации
 # LOGIN_REDIRECT_URL = '/'
+
 INTERNAL_IPS = [
      '127.0.0.1',
  ]
+
+# Константа для кеширования данных
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        # Путь к корневай папке самого кеша
+        'LOCATION': os.path.join(BASE_DIR, 'coolsite_cache'),
+    }
+}
