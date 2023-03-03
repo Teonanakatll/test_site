@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.core.cache import cache
 
 from women.models import Category
 
@@ -13,8 +14,11 @@ class DataMixin:
     def get_user_context(self, **kwargs):
         # Формируем начальный словарь из именнованных параметров переданных этой функции
         context = kwargs
-        # Импортируем аггр. ф. и дабавляем к категориям поле с кол-вом постов в категории
-        cats = Category.objects.all().annotate(Count('women'))
+        cats = cache.get('cats')  # Взять данные из кеша
+        if not cats:  # Если данных нет
+            # Импортируем аггр. ф. и дабавляем к категориям поле с кол-вом постов в категории
+            cats = Category.objects.all().annotate(Count('women'))
+            cache.set('cats', cats, 60)  # Имя кеша, данные, время
 
         user_menu = menu.copy()
         if not self.request.user.is_authenticated:

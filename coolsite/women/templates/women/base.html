@@ -1,5 +1,4 @@
 {% load static %}
-{% load cache %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,8 +36,6 @@
 <table class="table-content" border=0 cellpadding="0" cellspacing="0">
 <tr>
 <!-- Sidebar слева -->
-	<!--	sidebar - название кеша	-->
-		{% cache 60 sidebar %}
 	<td valign="top" class="left-chapters">
 
 	<ul id="leftchapters">
@@ -58,7 +55,6 @@
 			{% endif %}
 		{% endif %}
 		{% endfor %}
-		{% endcache %}
 
 		<li class="share">
 		<p>Наш канал</p>
