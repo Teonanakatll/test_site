@@ -45,7 +45,8 @@ class WomenHome(DataMixin, ListView):  #  В ListView уже встроен Pagi
 
     # Метод возвращает список записей отфильтрованный по условию
     def get_queryset(self):
-        return Women.objects.filter(is_published=True)
+        # select_related - жадная загрузка данных первичной модели, чтобы избавиться от дублирующих sql запросов
+        return Women.objects.filter(is_published=True).select_related('cat')
 
 
 # В функциях для ограничения доступа используют декоратор
@@ -176,7 +177,7 @@ class WomenCategory(DataMixin, ListView):
         # Когда будет формироваться экз. кл. WomenCategory для конкретного запроса
         # Через cсылку self обращаемся к словарю kwargs и берем параметр cat_slug
         # 'cat__slug' обращение к полю slug связанного первичного класса
-        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
+        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True).select_related('cat')
 
     # Формируем контекст для щаблона
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -184,8 +185,9 @@ class WomenCategory(DataMixin, ListView):
         # context['title'] = 'Категория - ' + str(context['posts'][0].cat)
         # context['menu'] = menu
         # context['cat_selected'] = context['posts'][0].cat_id
-        c_def = self.get_user_context(title='Категория - ' + str(context['posts'][0].cat),
-                                      cat_selected=context['posts'][0].cat_id)
+        c = Category.objects.get(slug=self.kwargs['cat_slug'])  # Избавляемся от дублей
+        c_def = self.get_user_context(title='Категория - ' + str(c.name),
+                                      cat_selected=c.pk)
         return dict(list(context.items()) + list(c_def.items()))
 
 
