@@ -1,10 +1,11 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from women.models import Women, Category
 
 class WomenAdmin(admin.ModelAdmin):
     # Поля которые будут отображаться в админ панели
-    list_display = ('id', 'title', 'time_create', 'photo', 'is_published')
+    list_display = ('id', 'title', 'time_create', 'get_html_photo', 'is_published')
 
     # Поля на которые мы можем кликнуть и перейти
     list_display_links = ('id', 'title')
@@ -20,6 +21,19 @@ class WomenAdmin(admin.ModelAdmin):
 
     # Автоматически заполняет поле slug при добавлении экземпляра класса
     prepopulated_fields = {'slug': ('title',)}
+
+    # Пример показывает как можно менять стандартный код в полях админ-панели на свой собственный
+
+    # Метод для отображения миниатюр в админ панели, возвращает html-код
+    # Параметр object ссылается на текущую запись списка (обьект модели Women)
+    # Обращаемся к полю photo и берем url
+    def get_html_photo(self, object):
+        if object.photo:  # Если фото существует
+            # Функция mark_safe указывает не экранировать символы
+            return mark_safe(f"<img src='{object.photo.url}' width=50")
+
+    # Меняем имя фото в админ панели
+    get_html_photo.short_description = "Миниатюра"
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
