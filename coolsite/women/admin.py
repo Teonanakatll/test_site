@@ -22,6 +22,14 @@ class WomenAdmin(admin.ModelAdmin):
     # Автоматически заполняет поле slug при добавлении экземпляра класса
     prepopulated_fields = {'slug': ('title',)}
 
+    # Порядок отображения (редактируемых) полей при редактировонии
+    fields = ('title', 'slug', 'cat', 'content', 'photo', 'get_html_photo', 'is_published', 'time_create', 'time_update')
+    # Поля только для чтения, добавляются в конец списка fields
+    readonly_fields = ('time_create', 'time_update', 'get_html_photo')
+
+    # Отображение панели с кнопкой сохранить сверху
+    save_on_top = True
+
     # Пример показывает как можно менять стандартный код в полях админ-панели на свой собственный
 
     # Метод для отображения миниатюр в админ панели, возвращает html-код
