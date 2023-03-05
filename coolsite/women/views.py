@@ -7,10 +7,10 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.decorators.cache import cache_page
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import AddPostForm, RegisterUserForm, LoginUserForm
+from .forms import AddPostForm, RegisterUserForm, LoginUserForm, ContactForm
 from .models import Women, Category
 from .utils import *
 
@@ -52,7 +52,7 @@ class WomenHome(DataMixin, ListView):  #  В ListView уже встроен Pagi
 
 # В функциях для ограничения доступа используют декоратор
 # @login_required
-@cache_page(60 * 15)   # Декоратор для кеширования ф. пред.
+# @cache_page(60 * 15)   # Декоратор для кеширования ф. пред.
 def about(request):  # Пагинация в функциях представлений
     contact_list = Women.objects.all()
     paginator = Paginator(contact_list, 3)
@@ -85,6 +85,7 @@ def about(request):  # Пагинация в функциях представл
 #         form = AddPostForm()
 #     return render(request, 'women/addpage.html', {'form': form, 'title': 'Добавление статьи'})
 
+# LoginRequiredMixin проверяет авторизован ли пользователь
 class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     # Указывает с какой формой связан этот класс представления
     form_class = AddPostForm
@@ -101,8 +102,25 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView):
         c_def = self.get_user_context(title='Добавление статьи')
         return dict(list(context.items()) + list(c_def.items()))
 
-def contact(request):
-    return HttpResponse("Обратная связь")
+# def contact(request):
+#     return HttpResponse("Обратная связь")
+
+# FormView стандартный класс для форм не связанных с моделями
+class ContactFormView(DataMixin, FormView):
+    form_class = ContactForm
+    template_name = 'women/contact.html'
+    success_url = reverse_lazy('home')
+
+    # Mетод формирует контекст для шаблона
+    def get_сontext_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Обратная связь')
+        return dict(list(context.items()) + list(c_def.items()))
+
+    # Mетод вызывается если пользователь верно заполнил все поля формы
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        return redirect('home')
 
 # Наследуем класс от стандартного класса LoginView в котором реализованна вся
 # необходимая логика для авторизации пользователя
@@ -136,6 +154,7 @@ def logout_user(request):
 #     }
 #     return render(request, 'women/post.html', context=context)
 
+# DetailView класс для отображения 1 модели
 class ShowPost(DataMixin, DetailView):
     model = Women
     template_name = 'women/post.html'
